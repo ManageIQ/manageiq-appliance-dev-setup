@@ -1,4 +1,6 @@
-# Purpose
+# ManageIQ Appliance Dev Setup
+
+## Purpose
 
 This directory contains instructions and associated scripts that aid in the process of creating
 MIQ development/test appliances that run in the indicated environment.
