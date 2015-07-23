@@ -6,7 +6,7 @@ HGFS_MIQ_DIR=/mnt/hgfs/${1:-miq}
 # Ensure host files are accessible.
 while true
 do
-	if [[ ! -d $HGFS_MIQ_DIR || ! -d $HGFS_MIQ_DIR/vmdb ]]
+	if [[ ! -d $HGFS_MIQ_DIR || ! -d $HGFS_MIQ_DIR/app || ! -d $HGFS_MIQ_DIR/lib ]]
 	then
 		if [[ ! -d $HGFS_MIQ_DIR ]]
 		then
@@ -31,58 +31,31 @@ done
 [[ -L $MIQ_DIR ]] && rm -f $MIQ_DIR
 ln -f -s $HGFS_MIQ_DIR $MIQ_DIR || exit 1
 
-# Ensure we use the same region number as the original appliance.
-cp $MIQ_SAV_DIR/vmdb/REGION $MIQ_DIR/vmdb/REGION
-
-# The path to the ruby command is added by the build.
-# We don't want to add the path to the default/evm file in the source tree,
-# so we break the link to the source tree evm file and update a copy
-# that's directly in /etc/default.
-cd /etc/default
-rm -f evm
-cp $MIQ_DIR/system/LINK/etc/default/evm evm
-ruby_bin_path=(/opt/rubies/ruby-2.0.0*/bin)
-echo "export PATH=\$PATH:$ruby_bin_path" >> evm
-
-# For some reason, files in /etc/init, that are links to files in the shared
-# folders, are not honored by init. To fix this, we just copy the contents of
-# the files in question to their respective files in /etc/init.
-cd /etc/init
-[[ -d miqconsole.conf.orig ]] || mv miqconsole.conf miqconsole.conf.orig
-cp $MIQ_DIR/system/LINK/etc/init/miqconsole.conf miqconsole.conf
-[[ -d evm_watchdog.conf.orig ]] || mv evm_watchdog.conf evm_watchdog.conf.orig
-cp $MIQ_DIR/system/LINK/etc/init/evm_watchdog.conf evm_watchdog.conf
+# Ensure we use the same GUID as the original appliance.
+ln -f -s $MIQ_SAV_DIR/GUID $MIQ_DIR/GUID || exit 1
+# Ensure we use the same database.yml as the original appliance.
+ln -f -s $MIQ_SAV_DIR/config/database.yml $MIQ_DIR/config/database.yml || exit 1
 
 # For fleecing, saving intermediate data to the /var/www/miq/vmdb/data/metadata
 # directory doesn't seem to work reliably through shared folders. To fix this,
 # create a local directory for the metadata and create a symbolic link to it.
 [[ -d $LOCAL_METADATA_DIR ]] || mkdir -p $LOCAL_METADATA_DIR
-[[ -d $MIQ_DIR/vmdb/data ]] || mkdir -p $MIQ_DIR/vmdb/data
-[[ -d $MIQ_DIR/vmdb/data/metadata && ! -L $MIQ_DIR/vmdb/data/metadata ]] && rmdir $MIQ_DIR/vmdb/data/metadata
-ln -f -s $LOCAL_METADATA_DIR $MIQ_DIR/vmdb/data/metadata
+[[ -d $MIQ_DIR/data ]] || mkdir -p $MIQ_DIR/data
+[[ -d $MIQ_DIR/data/metadata && ! -L $MIQ_DIR/data/metadata ]] && rmdir $MIQ_DIR/data/metadata
+ln -f -s $LOCAL_METADATA_DIR $MIQ_DIR/data/metadata
 
 # We don't want logs written to our source tree.
 echo "**** Creating link to local log directory..."
 [[ -d $LOCAL_LOG_DIR ]] || mkdir -p $LOCAL_LOG_DIR
-[[ -d $MIQ_DIR/vmdb/log && ! -L $MIQ_DIR/vmdb/log ]] && rmdir $MIQ_DIR/vmdb/log
-ln -f -s $LOCAL_LOG_DIR $MIQ_DIR/vmdb/log
-echo "**** Run: git update-index --assume-unchanged vmdb/log/.gitkeep on MAC."
+[[ -d $LOCAL_LOG_DIR/apache ]] || mkdir -p $LOCAL_LOG_DIR/apache
+[[ -d $MIQ_DIR/log && ! -L $MIQ_DIR/log ]] && rm -rf $MIQ_DIR/log
+ln -f -s $LOCAL_LOG_DIR $MIQ_DIR/log
+echo "**** Run: git update-index --assume-unchanged log/.gitkeep on MAC."
 
 # We don't want compiled assets written to our source tree.
 # XXX this doesn't work because rake evm:compile_assets removes the link.
 [[ -d $LOCAL_ASSETS_DIR ]] || mkdir -p $LOCAL_ASSETS_DIR
-[[ -d $MIQ_DIR/vmdb/public/assets && ! -L $MIQ_DIR/vmdb/public/assets ]] && rm -rf $MIQ_DIR/vmdb/public/assets
-ln -f -s $LOCAL_ASSETS_DIR $MIQ_DIR/vmdb/public/assets
-
-# Create link to NetApp library Ruby bindings.
-# cd $MIQ_DIR/lib/NetappManageabilityAPI/NmaCore || exit 1
-# [[ -d lib && ! -L lib ]] && rm -rf lib
-# [[ -L lib ]] && rm -f lib
-# ln -f -s $MIQ_SAV_DIR/lib/NetappManageabilityAPI/NmaCore/lib lib
-
-# Create link to MiqBlockDevOps.so
-cd $MIQ_DIR/lib/disk/modules || exit 1
-[[ -L MiqBlockDevOps.so ]] && rm -f MiqBlockDevOps.so
-ln -f -s $MIQ_SAV_DIR/lib/disk/modules/MiqBlockDevOps.so MiqBlockDevOps.so
+[[ -d $MIQ_DIR/public/assets && ! -L $MIQ_DIR/public/assets ]] && rm -rf $MIQ_DIR/public/assets
+ln -f -s $LOCAL_ASSETS_DIR $MIQ_DIR/public/assets
 
 exit 0
