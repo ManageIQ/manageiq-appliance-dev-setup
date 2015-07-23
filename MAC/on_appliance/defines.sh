@@ -1,4 +1,4 @@
-MIQ_DIR=/var/www/miq
+MIQ_DIR=/var/www/miq/vmdb
 MIQ_SAV_DIR=${MIQ_DIR}.orig
 DEFAULTS_DIR=/etc/default
 
