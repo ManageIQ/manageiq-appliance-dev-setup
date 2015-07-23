@@ -6,7 +6,7 @@ HGFS_MIQ_DIR=/mnt/hgfs/${1:-miq}
 # Ensure host files are accessible.
 while true
 do
-	if [[ ! -d $HGFS_MIQ_DIR || ! -d $HGFS_MIQ_DIR/app|| ! -d $HGFS_MIQ_DIR/lib ]]
+	if [[ ! -d $HGFS_MIQ_DIR || ! -d $HGFS_MIQ_DIR/app || ! -d $HGFS_MIQ_DIR/lib ]]
 	then
 		if [[ ! -d $HGFS_MIQ_DIR ]]
 		then
