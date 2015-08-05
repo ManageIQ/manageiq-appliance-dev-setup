@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(dirname $_)
+export SCRIPT_DIR
+
 HGFS_MIQ_DIR=${1:-miq}
 
 STEPS=(

@@ -1,4 +1,5 @@
 #!/bin/bash
+. $SCRIPT_DIR/defines.sh
 
 cd $MIQ_DIR || exit 1
 

@@ -1,8 +1,9 @@
 #!/bin/bash
 
-THIS_DIR=$(dirname $_)
+SCRIPT_DIR=$(dirname $_)
+export SCRIPT_DIR
 
-. $THIS_DIR/defines.sh
+. $SCRIPT_DIR/defines.sh
 
 # For fleecing, saving intermediate data to the /var/www/miq/vmdb/data/metadata
 # directory doesn't seem to work reliably through shared folders. To fix this,
@@ -26,6 +27,6 @@ echo "**** Run: git update-index --assume-unchanged log/.gitkeep on MAC."
 [[ -d $MIQ_DIR/public/assets && ! -L $MIQ_DIR/public/assets ]] && rm -rf $MIQ_DIR/public/assets
 ln -f -s $LOCAL_ASSETS_DIR $MIQ_DIR/public/assets
 
-. $THIS_DIR/miq-setup.sh
+$SCRIPT_DIR/miq-setup.sh
 
 exit 0
