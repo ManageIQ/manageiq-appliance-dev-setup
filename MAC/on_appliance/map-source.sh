@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. $(dirname $_)/defines.sh
+. $SCRIPT_DIR/defines.sh
 HGFS_MIQ_DIR=/mnt/hgfs/${1:-miq}
 
 # Ensure host files are accessible.
