@@ -1,5 +1,6 @@
 #!/bin/bash
 
+. $SCRIPT_DIR/defines.sh
 PACKAGES=$(cat <<-END_PACKAGES
 		fuse
 	END_PACKAGES
@@ -19,6 +20,17 @@ then
 		sed -e "s/SELINUX=enforcing/SELINUX=permissive/" < config.sav > config
 		echo "**** done."
 	fi
+fi
+
+# Allow Apache to follow the symbolic link created above and set selinux accordingly
+if [[ ! -f $SYMLINKS_HTTP_CONF ]]
+then
+  cat << CONF_END > $SYMLINKS_HTTP_CONF
+<Directory "/var/www/miq">
+  Options FollowSymLinks
+</Directory>
+CONF_END
+  /usr/bin/chcon --reference=/etc/httpd/conf/httpd.conf $SYMLINKS_HTTP_CONF
 fi
 
 # Install the required software packages.
