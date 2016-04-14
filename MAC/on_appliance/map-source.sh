@@ -63,14 +63,4 @@ ln -f -s $LOCAL_ASSETS_DIR $MIQ_DIR/public/assets
 [[ -d $MIQ_DIR/vendor/assets && ! -L $MIQ_DIR/vendor/assets ]] && rm -rf $MIQ_DIR/vendor/assets
 ln -f -s $LOCAL_VENDOR_ASSETS_DIR $MIQ_DIR/vendor/assets
 
-# Allow Apache to follow the symbolic link created above and set selinux accordingly
-if [[ ! -f $SYMLINKS_HTTP_CONF ]]
-then
-  cat << CONF_END > $SYMLINKS_HTTP_CONF
-<Directory "/var/www/miq">
-  Options FollowSymLinks
-</Directory>
-CONF_END
-  /usr/bin/chcon --reference=/etc/httpd/conf/httpd.conf $SYMLINKS_HTTP_CONF
-fi
 exit 0
