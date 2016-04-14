@@ -27,6 +27,11 @@ echo "**** Run: git update-index --assume-unchanged log/.gitkeep on MAC."
 [[ -d $MIQ_DIR/public/assets && ! -L $MIQ_DIR/public/assets ]] && rm -rf $MIQ_DIR/public/assets
 ln -f -s $LOCAL_ASSETS_DIR $MIQ_DIR/public/assets
 
+# We don't want compiled assets written to our source tree.
+[[ -d $LOCAL_VENDOR_ASSETS_DIR ]] || mkdir -p $LOCAL_VENDOR_ASSETS_DIR
+[[ -d $MIQ_DIR/vendor/assets && ! -L $MIQ_DIR/vendor/assets ]] && rm -rf $MIQ_DIR/vendor/assets
+ln -f -s $LOCAL_VENDOR_ASSETS_DIR $MIQ_DIR/vendor/assets
+
 $SCRIPT_DIR/miq-setup.sh
 
 exit 0
