@@ -11,6 +11,7 @@ echo
 
 # Migrate the database.
 echo "**** Migrateing the database..."
+cd /var/www/miq/vmdb/
 bin/rake db:migrate || exit 1
 echo "**** done."
 echo
